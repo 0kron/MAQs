@@ -11,7 +11,17 @@ MAQs (Unitree Go2) conexión, control, documentación y automatización.
 Ubuntu 20.04LTS
 Ubuntu 22.XLTS
 
-
+### Activación Docker
+```bash
+# Al ejecutar el contenedor, montar el directorio
+docker run -it --rm \
+  --name go2_dev \
+  --network host \
+  -v ~/"{PWD}"/maq-volume:/workspace/maq-volume \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -e DISPLAY=$DISPLAY \
+  go2_ros2_image
+```
 
 ### Conexión SSH - CPU Principal (Jetson)
 
