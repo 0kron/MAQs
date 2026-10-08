@@ -38,3 +38,4 @@ ros2 topic list
 
 
 ## Trouble Shooting
+# Dependencias y Software de MAQs
