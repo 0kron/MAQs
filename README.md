@@ -13,14 +13,19 @@ Ubuntu 22.XLTS
 
 ### Activación Docker
 ```bash
-# Al ejecutar el contenedor, montar el directorio
 docker run -it --rm \
   --name go2_dev \
   --network host \
-  -v ~/"{PWD}"/maq-volume:/workspace/maq-volume \
+  --privileged \
+  -v ~/MAQs/maq-volume:/workspace/maq-volume \
   -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
+  -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
   -e DISPLAY=$DISPLAY \
-  go2_ros2_image
+  -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
+  -e XDG_RUNTIME_DIR=/run/user/1000 \
+  -e QT_QPA_PLATFORM=xcb \
+  -e QT_X11_NO_MITSHM=1 \
+  go2_ros2_humble # Docker MAQs
 ```
 
 ### Conexión SSH - CPU Principal (Jetson)
@@ -46,6 +51,3 @@ source ~/unitree_ros2/setup.sh
 ros2 topic list
 ```
 
-
-## Trouble Shooting
-# Dependencias y Software de MAQs
