@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Go2 · LiDAR en vivo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; height: 100dvh; min-height: 480px; display: flex; flex-direction: column; font: 14px system-ui, sans-serif; color: #222; background: white; }
+    header { padding: 10px 12px; border-bottom: 1px solid #ccc; }
+    .header-row { display: flex; align-items: center; gap: 12px; }
+    .university-logo { display: block; width: 135px; height: 90px; object-fit: contain; flex-shrink: 0; }
+    .header-controls { flex: 1; min-width: 0; }
+    form, .readout { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+    input, button, select { font: inherit; padding: 4px; }
+    #endpoint { width: 240px; max-width: 65vw; }
+    .readout { margin-top: 7px; font-size: 12px; }
+    #intensity-scale { display: inline-flex; align-items: center; gap: 5px; }
+    #intensity-gradient { width: 90px; height: 9px; background: linear-gradient(to right, blue, cyan, lime, yellow, red); }
+    #intensity-scale[hidden] { display: none; }
+    #viewport { min-height: 320px; min-width: 0; flex: 1; overflow: hidden; }
+    @media (max-width: 600px) { .header-row { align-items: flex-start; } .university-logo { width: 90px; height: 60px; } }
+    canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+    footer { padding: 8px 12px; font-size: 12px; }
+    #error { min-height: 1em; margin-top: 4px; }
+  </style>
+  <script type="importmap">
+    {"imports":{"three":"./vendor/three/three.module.js","three/examples/jsm/":"./vendor/three/"}}
+  </script>
+</head>
+<body>
+  <header>
+    <div class="header-row">
+    <img class="university-logo" src="./assets/university_logo.jpg" alt="Universidad Panamericana" width="135" height="90">
+    <div class="header-controls">
+    <form id="connection-form">
+      <strong>Go2 / LiDAR</strong>
+      <label>WebSocket <input id="endpoint" list="websocket-addresses" aria-label="Dirección WebSocket"></label>
+      <datalist id="websocket-addresses">
+        <option value="ws://192.168.123.18:9090">Robot del laboratorio</option>
+        <option value="ws://127.0.0.1:9090">Simulador local</option>
+      </datalist>
+      <button type="submit">Conectar</button>
+      <button id="disconnect" type="button">Desconectar</button>
+      <span id="connection" role="status">Desconectado</span>
+    </form>
+    <div class="readout">
+      <label for="cloud-topic">Nube de puntos</label>
+      <select id="cloud-topic">
+        <option>/utlidar/cloud</option>
+        <option>/utlidar/cloud_base</option>
+        <option>/utlidar/cloud_deskewed</option>
+        <option value="viewer/map" selected>Mapa acumulado local (cloud_base)</option>
+      </select>
+      <label for="cloud-view">Vista</label>
+      <select id="cloud-view">
+        <option value="world">Robot y entorno</option>
+        <option value="sensor">Solo LiDAR (sin TF)</option>
+      </select>
+      <button id="clear-map" type="button">Limpiar mapa local</button>
+      <button id="reset-view" type="button">Restablecer vista</button>
+      <button id="reset-floor" type="button">Ajustar piso a patas</button>
+      <label for="model-anchor">Referencia del modelo</label>
+      <select id="model-anchor">
+        <option value="odom">Cuerpo de odometría (visual)</option>
+        <option value="tf">Base del URDF (TF)</option>
+      </select>
+      <span id="view-note" hidden>Coordenadas originales de la nube; sin alinear con el modelo del robot.</span>
+      <span id="model-status">Cargando URDF…</span>
+      <span id="pose-status">Posición: esperando datos</span>
+      <span id="joint-status">Articulaciones: esperando datos</span>
+      <span id="cloud-status">LiDAR: esperando datos</span>
+      <span id="intensity-status">Intensidad: esperando datos</span>
+      <span id="intensity-scale" hidden aria-label="Escala de intensidad: baja en azul, alta en rojo">
+        <span id="intensity-min"></span><span id="intensity-gradient" aria-hidden="true"></span><span id="intensity-max"></span>
+      </span>
+      <span id="imu-status">IMU: esperando datos</span>
+    </div>
+    </div>
+    </div>
+  </header>
+  <div id="viewport" aria-label="Robot y nube de puntos LiDAR en 3D"></div>
+  <footer>
+    Arrastra para girar la vista · Usa la rueda para acercar · Coordenadas en metros, eje Z hacia arriba · Cuadrícula: referencia fija del piso
+    <details id="alignment-details"><summary>Datos de alineación</summary><pre id="alignment-data">Esperando odometría y nube.</pre></details>
+    <div id="error" role="alert"></div>
+  </footer>
+  <script>
+    if (location.protocol === 'file:') {
+      document.getElementById('connection').textContent = 'Abre la página desde el servidor local';
+      document.getElementById('model-status').textContent = 'URDF: esperando el servidor local';
+      document.querySelectorAll('button, input, select').forEach(control => { control.disabled = true; });
+      const output = document.getElementById('error');
+      const link = document.createElement('a');
+      link.href = 'http://localhost:8000/main.html';
+      link.textContent = link.href;
+      output.append('Mantén robot.py en ejecución y abre ', link, '.');
+    } else {
+      const module = document.createElement('script');
+      module.type = 'module';
+      module.src = './main.js';
+      module.onerror = () => {
+        document.getElementById('error').textContent = 'No se pudo cargar el visor. Abre la dirección que muestra robot.py.';
+      };
+      document.body.appendChild(module);
+    }
+  </script>
+</body>
+</html>
