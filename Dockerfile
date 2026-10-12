@@ -30,4 +30,7 @@ WORKDIR /workspace
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.zshrc
 RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ~/.zshrc
 
+RUN printf '#!/bin/sh\nssh -X -o ConnectTimeout=5 -o BatchMode=yes -o ConnectionAttempts=1 unitree@192.168.123.18 "$@"\n' > /usr/local/bin/maq_wire && \
+    chmod +x /usr/local/bin/maq_wire
+
 CMD [ "zsh" ]
