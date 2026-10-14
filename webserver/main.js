@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import URDFLoader from './vendor/urdf/URDFLoader.js';
-import { decodeCloud, intensityColors } from './pointcloud.mjs';
-import { VoxelMap } from './voxelmap.mjs';
+import * as THREE from 'three'; // importamos three.js para escena 3D y renderizado
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'; // orbitControls te permite mover la camara con el mouse
+import URDFLoader from './vendor/urdf/URDFLoader.js'; // carga el modelo del robot de la descripción URDF
+import { decodeCloud, intensityColors } from './pointcloud.mjs'; // manejan los datos de nubes de puntos
+import { VoxelMap } from './voxelmap.mjs'; // se usa para construir el mapa
 
-const $ = id => document.getElementById(id);
+const $ = id => document.getElementById(id); // define un atajo
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff);
