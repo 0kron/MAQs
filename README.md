@@ -29,9 +29,12 @@ Entrar a la terminal:
 docker compose exec go2_dev zsh
 ```
 
-> Es decir, el contendor se queda listo para su ejecución en todo momento. Así,
-se pueden ejecutar comandos solos como por ejemplo ir directo a la conexión ssh
-con `docker compose go2_dev exec maq_wire`.
+Conexión SSH:
+```bash
+docker compose exec go2_dev maq_wire
+```
+
+> Es decir, el contendor se queda listo para su ejecución en todo momento.
 
 Reinicio:
 ```bash
