@@ -129,6 +129,7 @@ function updateRobotVisibility() {
   grid.visible = !sensorView() && robotAligned;
 }
 
+// Calcula donde deberia de estar el piso basado en las posiciones de las patas del robot
 function updateFloorReference() {
   if (!robotAligned || !motors || floorFrame === pose.frame) return;
   robot.updateMatrixWorld(true);
@@ -142,6 +143,7 @@ function updateFloorReference() {
 }
 $('reset-floor').onclick = () => { floorFrame = null; updateFloorReference(); };
 
+// Maneja como debria de ajustarse el modelo del robot al movimiento
 function applyRobotState() {
   if (!robot) return;
   robotAligned = false;
