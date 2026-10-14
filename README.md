@@ -8,40 +8,69 @@ MAQs (Unitree Go2) conexión, control, documentación y automatización.
 
 ## Guía de Conexión 
 
-Ubuntu 20.04LTS
-Ubuntu 22.XLTS
+### Crear imagen Docker
+```bash
+docker compose up -d --build
+```
 
 ### Activación Docker
+- Uso no persistente: 
 ```bash
-docker run -it --rm \
-  --name go2_dev \
-  --network host \
-  --privileged \
-  -v ~/MAQs/maq-volume:/workspace/maq-volume \
-  -v /tmp/.X11-unix:/tmp/.X11-unix:rw \
-  -v $XDG_RUNTIME_DIR/$WAYLAND_DISPLAY:/tmp/$WAYLAND_DISPLAY \
-  -e DISPLAY=$DISPLAY \
-  -e WAYLAND_DISPLAY=$WAYLAND_DISPLAY \
-  -e XDG_RUNTIME_DIR=/run/user/1000 \
-  -e QT_QPA_PLATFORM=xcb \
-  -e QT_X11_NO_MITSHM=1 \
-  go2_ros2_humble # Docker MAQs
+docker compose run --rm go2_dev
 ```
+
+- Uso persistente:
+```bash
+docker compose start
+```
+
+Entrar a la terminal:
+```bash
+docker compose exec go2_dev zsh
+```
+
+> Es decir, el contendor se queda listo para su ejecución en todo momento. Así,
+se pueden ejecutar comandos solos como por ejemplo ir directo a la conexión ssh
+con `docker compose go2_dev exec maq_wire`.
+
+Reinicio:
+```bash
+docker compose start
+```
+
+Pausa:
+```bash
+docker compose stop
+```
+
+Eliminación: 
+```bash
+docker compose down
+```
+
 
 ### Conexión SSH - CPU Principal (Jetson)
 
 ```bash
-ssh -X unitree@192.168.123.18
+maq_wire
 ```
+> Alias para el comando: `ssh -X unitree@192.168.123.18`
 
 ```text
 pssword: 123
 ```
 
+### Inicializar Ros2
+```bash 
+init_ros2
+```
+> Alias para el comando: `source /workspace/maq-volume/unitree_ros2/setup.sh`
+
+
 ### Entorno ROS 2
 ```bash
 ros:foxy(1) noetic(2) ?
-> 1 <CR>
+> 1<CR>
 ```
 
 ### Ejecución de LiDAR
