@@ -6,6 +6,8 @@ import { VoxelMap } from './voxelmap.mjs'; // se usa para construir el mapa
 
 const $ = id => document.getElementById(id); // define un atajo
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
+
+// se crea la escena, se prepara la camera, renderer de WebGL y controles de orbita
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xffffff);
 const camera = new THREE.PerspectiveCamera(50, 1, 0.02, 100);
@@ -24,12 +26,13 @@ const grid = new THREE.GridHelper(10, 20, 0xbbbbbb, 0xeeeeee);
 grid.rotation.x = Math.PI / 2;
 grid.position.z = -0.025;
 scene.add(grid);
-const cloudGeometry = new THREE.BufferGeometry();
-const cloud = new THREE.Points(cloudGeometry, new THREE.PointsMaterial({
+const cloudGeometry = new THREE.BufferGeometry(); // BufferGeometry contiene las posiciones de los puntos
+const cloud = new THREE.Points(cloudGeometry, new THREE.PointsMaterial({ // Renderizamos los puntos
   color: 0xffffff, vertexColors: true, size: 0.022, sizeAttenuation: true,
 }));
 scene.add(cloud);
 
+// Las siguientes variables monitorean lso datos mientras lelgan, como el modelo robot, lecturas del sensor y conexión WS
 let robot, modelFailed = false, robotAligned = false, socket, generation = 0;
 let reconnectTimer, connectionTimer, reconnectAttempt = 0;
 let pose = null, motors = null, pendingCloud = null;
@@ -41,13 +44,18 @@ let cameraBodyPosition = null;
 const jointTargets = new Map();
 const localMap = new VoxelMap();
 let lastMapInputAt = 0, lastMapUpdateAt = 0;
+
+// Dependiendo del mapa que este seleccionado escogen que topic usar y que etiqueta imprimir
 const localMapSelected = () => $('cloud-topic').value === 'viewer/map';
 const cloudSource = (topic = $('cloud-topic').value) => topic === 'viewer/map' ? '/utlidar/cloud_base' : topic;
 const cloudLabel = () => localMapSelected() ? 'Mapa local' : isMapTopic($('cloud-topic').value) ? 'Mapa' : 'LiDAR';
+
+// Escribe datos a la pagine html formateados como JSON para inspeccionar
 function updateAlignmentData() {
   $('alignment-data').textContent = JSON.stringify({ nube: latestCloudHeader,
     odometria: latestOdom && { header: latestOdom.header, child_frame_id: latestOdom.child_frame_id, pose: latestOdom.pose.pose } }, null, 2);
 }
+
 const isMapTopic = topic => ['viewer/map', '/uslam/cloud_map', '/utlidar/voxel_map'].includes(topic);
 const sensorView = () => $('cloud-view').value === 'sensor';
 let lastPoseAt = 0, lastJointAt = 0, lastCloudAt = 0, lastImuAt = 0;
@@ -59,7 +67,7 @@ const vector = v => new THREE.Vector3(v.x, v.y, v.z);
 const quaternion = q => new THREE.Quaternion(q.x, q.y, q.z, q.w).normalize();
 const poseMatrix = p => new THREE.Matrix4().compose(vector(p.position), quaternion(p.orientation), new THREE.Vector3(1, 1, 1));
 const tfMatrix = t => new THREE.Matrix4().compose(vector(t.translation), quaternion(t.rotation), new THREE.Vector3(1, 1, 1));
-const typeByTopic = {
+const typeByTopic = { // Relaciona topicos con su tipo de mensaje
   '/tf': 'tf2_msgs/msg/TFMessage', '/tf_static': 'tf2_msgs/msg/TFMessage',
   '/utlidar/robot_odom': 'nav_msgs/msg/Odometry',
   '/utlidar/robot_pose': 'geometry_msgs/msg/PoseStamped',
@@ -71,6 +79,7 @@ const typeByTopic = {
 const baseTopics = Object.keys(typeByTopic);
 const motorOrder = ['FR', 'FL', 'RR', 'RL']; // Unitree motor indices 0–11.
 
+// Dependiendo de lo que el usuario seleciono como vista ajustamos la camara. ie. mapa pone la camara mas lejos
 function resetView() {
   cameraBodyPosition = null;
   if (sensorView() || (isMapTopic($('cloud-topic').value) && !robotAligned)) {
