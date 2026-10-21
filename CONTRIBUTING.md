@@ -21,7 +21,7 @@ permitir su revisión mediante Git y GitHub.
 Las ramas de nuevos features o ideas siguen la siguiente convención:
 
 ```text
-<nombre del feature>/<nombre del autor>
+<nombre del feature>-<nombre del autor>
 ```
 
 Utiliza minúsculas y guiones si así lo requiere el feature. Solo utiliza tu 

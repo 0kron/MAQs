@@ -27,10 +27,10 @@ RUN mkdir -p /root/.ssh && chmod 700 /root/.ssh
 
 # Workspace
 WORKDIR /workspace
-RUN echo "source /opt/ros/humble/setup.bash" >> ~/.zshrc
+RUN echo "source /opt/ros/humble/setup.zsh" >> ~/.zshrc
 RUN echo "export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp" >> ~/.zshrc
 
-RUN printf '#!/bin/sh\nssh -X -o ConnectTimeout=5 -o BatchMode=yes -o ConnectionAttempts=1 unitree@192.168.123.18 "$@"\n' > /usr/local/bin/maq_wire && \
+RUN printf '#!/bin/sh\nssh -X -o ConnectTimeout=5 -o ConnectionAttempts=1 unitree@192.168.123.18 "$@"\n' > /usr/local/bin/maq_wire && \
     chmod +x /usr/local/bin/maq_wire
 
 CMD [ "zsh" ]

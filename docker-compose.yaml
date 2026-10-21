@@ -16,8 +16,10 @@ services:
       - XDG_RUNTIME_DIR=/run/user/1000
       - QT_QPA_PLATFORM=xcb
       - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/root/.Xauthority
     volumes:
       - ${HOME}/MAQs/maq-volume:/workspace/maq-volume
+      - ${HOME}/.Xauthority:/root/.Xauthority:ro
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${XDG_RUNTIME_DIR}/${WAYLAND_DISPLAY}:/tmp/${WAYLAND_DISPLAY}
     working_dir: /workspace/maq-volume
