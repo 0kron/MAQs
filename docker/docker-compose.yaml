@@ -1,0 +1,26 @@
+services:
+  go2_dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: go2_ros2_humble
+    container_name: go2_dev
+    hostname: go2_dev
+    network_mode: host
+    stdin_open: true
+    tty: true
+    environment:
+      - DISPLAY=${DISPLAY}
+      - WAYLAND_DISPLAY=${WAYLAND_DISPLAY}
+      - XDG_RUNTIME_DIR=/run/user/1000
+      - QT_QPA_PLATFORM=xcb
+      - QT_X11_NO_MITSHM=1
+      - PULSE_SERVER=/mnt/wslg/PulseServer
+    volumes:
+      - ../maq-volume:/workspace/maq-volume
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${XDG_RUNTIME_DIR}:${XDG_RUNTIME_DIR}
+      - ${HOME}/.Xauthority:/root/.Xauthority:ro
+      - /dev/dri:/dev/dri
+    working_dir: /workspace/maq-volume
+    command: zsh
